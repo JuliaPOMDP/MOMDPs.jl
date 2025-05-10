@@ -1,5 +1,5 @@
 """
-    MOMDP{X, Y, A, O}
+    MOMDP{X, Y, A, O} <: POMDP{Tuple{X,Y},A,O}
 
 Abstract base type for a mixed observable Markov decision process.
 
@@ -19,10 +19,6 @@ abstract type MOMDP{X,Y,A,O} <: POMDP{Tuple{X,Y},A,O} end
 Return the transition distribution over the next visible state given the current state and action.
 
 T_x(s, a, x′) = p(x′ | s, a) where s = (x,y)
-
-    transition_x(m::MDP, state, action)
-
-Same as `transition(m, state, action)`.
 """
 function transition_x end
 
@@ -168,14 +164,32 @@ end
     @req length(::typeof(sys))
 end
 
-# Define if y_prime is dependent on x_prime given, x, y, a
-# Does p(y_prime | x, y, a, x_prime) = p(y_prime | x, y, a)
+"""
+    is_y_prime_dependent_on_x_prime(m::MOMDP)
+
+Defines if the next hidden state `y′` depends on the next visible state `x′` given the current visible state `x`, hidden state `y`, and action `a`.
+
+Return `false` if the conditional probability distribution satisfies:
+`p(y′ | x, y, a, x′) = p(y′ | x, y, a)`.
+"""
 is_y_prime_dependent_on_x_prime(::MOMDP) = true
 
-# Define if x_prime is dependent on y, given x, a
-# Does p(x_prime | x, y, a) = p(x_prime | x, a)
+"""
+    is_x_prime_dependent_on_y(m::MOMDP)
+
+Defines if the next visible state `x′` depends on the current hidden state `y` given the current visible state `x` and action `a`.
+
+Returns `false` if the conditional probability distribution satisfies:
+`p(x′ | x, y, a) = p(x′ | x, a)`.
+"""
 is_x_prime_dependent_on_y(::MOMDP) = true
 
-# Define if initial distribution of x and y are independent
-# In the initial distribution, does p(x, y) = p(x)p(y)
+"""
+    is_initial_distribution_independent(m::MOMDP)
+
+Defines whether the initial distributions of the visible state `x` and hidden state `y` are independent.
+
+Returns `true` if the joint probability distribution satisfies:
+`p(x, y) = p(x)p(y)`, meaning `x` and `y` are independent in the initial distribution.
+"""
 is_initial_distribution_independent(::MOMDP) = true
