@@ -16,7 +16,7 @@ With an alpha vector policy represented as `MOMDPAlphaVectorPolicy` (a collectio
 $$V(x, b_{\mathcal{Y}}) = \max_{\alpha \in \Gamma_{y(x)}} \{\alpha \cdot b_{\mathcal{Y}} \}$$
 [`value(p::MOMDPAlphaVectorPolicy, b, x)`](@ref) is provided to evaluate a `MOMDPAlphaVectorPolicy` with a known visible state `x`.
 
-However, to maintain compatibility with simulation tools already existing within the POMDPs.jl ecosystem we also provide the ability to execute a computed MOMDP policy as an `MOMDPAlphaVectorPolicy` assuming a POMDP modle (allowing for uncertainty over $\mathcal{X}$ as well). We first calculate $b_{\mathcal{X}}(x) = \sum_{y \in \mathcal{Y}} b(x,y)$ and then 
+However, to maintain compatibility with simulation tools already existing within the POMDPs.jl ecosystem we also provide the ability to execute a computed MOMDP policy as an `MOMDPAlphaVectorPolicy` assuming a POMDP model (allowing for uncertainty over $\mathcal{X}$ as well). We first calculate $b_{\mathcal{X}}(x) = \sum_{y \in \mathcal{Y}} b(x,y)$ and then 
 $$V^\prime(b) = \sum_{x \in \mathcal{X}} b_{\mathcal{X}}(x) V(x, b_{\mathcal{Y} \mid x})$$
 where $b_{\mathcal{Y} \mid x} = b(x,y) / b_{\mathcal{X}}(x)$. This value calcualtion is provided by [`value(p::MOMDPAlphaVectorPolicy, b)`](@ref).
 
