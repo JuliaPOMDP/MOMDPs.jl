@@ -2,8 +2,8 @@
 
 [![CI](https://github.com/JuliaPOMDP/MOMDPs.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaPOMDP/MOMDPs.jl/actions/workflows/CI.yml)
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaPOMDP.github.io/MOMDPs.jl/stable)
+[![codecov](https://codecov.io/gh/JuliaPOMDP/MOMDPs.jl/graph/badge.svg?token=2CywyuM9Hw)](https://codecov.io/gh/JuliaPOMDP/MOMDPs.jl)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
-<!-- [![codecov](https://codecov.io/gh/JuliaPOMDP/MOMDPs.jl/graph/badge.svg?token=WJ3ZQYQVK1)](https://codecov.io/gh/JuliaPOMDP/MOMDPs.jl) -->
 
 **MOMDPs.jl** provides structures and tools for Mixed Observability Markov Decision Processes (MOMDPs) in Julia. It is built on top of the [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl) framework, extending its functionality to a factorized state space composed of a fully observed state and a partially observed state.
     
