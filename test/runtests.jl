@@ -60,6 +60,7 @@ end
         mutable struct X <: MOMDP{Float64, Int, Int, Bool} end
         abstract type Z <: MOMDP{Float64, Int, Int, Bool} end
         mutable struct Y <: Z end
+        mutable struct W <: POMDP{Float64, Int, Bool} end
     
         @test_throws ErrorException statetype(Int)
         @test_throws ErrorException actiontype(Int)
@@ -76,6 +77,16 @@ end
         @test statetype_x(Y) == Float64
         @test statetype_y(X) == Int
         @test statetype_y(Y) == Int
+        
+        x = X()
+        y = Y()
+        @test statetype_x(x) == Float64
+        @test statetype_y(x) == Int
+        @test statetype_x(y) == Float64
+        @test statetype_y(y) == Int
+        
+        @test_throws ErrorException statetype_x(W)
+        @test_throws ErrorException statetype_y(W)
     end
     
     @testset "Interface Tests" begin
@@ -113,6 +124,13 @@ end
         @test isa(actions(momdp), AbstractVector)
         @test isa(discount(momdp), Number)
         @test isa(observations(momdp), AbstractVector)
+        
+        # Test default conditional independence assumptions
+        mutable struct X <: MOMDP{Float64, Int, Int, Bool} end
+        x = X()
+        @test is_y_prime_dependent_on_x_prime(x) == true
+        @test is_x_prime_dependent_on_y(x) == true
+        @test is_initial_distribution_independent(x) == true
     end
 
     @testset "RockSample MOMDP Implementation" begin
@@ -213,6 +231,19 @@ end
             # Check probability matches
             @test pdf(obs_pomdp, o_pomdp) ≈ pdf(obs_momdp, o_momdp_y)
         end
+        
+        # Test obsindex function for pomdp_of_momdp
+        s = (SVector{2,Int}((1, 1)), SVector{3,Bool}([true, true, true]))
+        o = 1
+        @test obsindex(pomdp_of_momdp, (s, o)) == 1
+        
+        s = (SVector{2,Int}((1, 1)), SVector{3,Bool}([true, true, true]))
+        o = 2
+        @test obsindex(pomdp_of_momdp, (s, o)) == 1 + length(states_x(pomdp_of_momdp.momdp))
+        
+        s = (SVector{2,Int}((2, 1)), SVector{3,Bool}([true, true, true]))
+        o = 2
+        @test obsindex(pomdp_of_momdp, (s, o)) == 2 + length(states_x(pomdp_of_momdp.momdp))
     end
 
     @testset "SARSOP Policy Value Comparisons" begin
