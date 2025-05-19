@@ -8,3 +8,9 @@ ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 RockSample = "de008ff0-c357-11e8-3329-7fe746fe836e"
 SARSOP = "cef570c6-3a94-5604-96b7-1a5e143043f2"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
+[compat]
+Documenter = "1.11"
+RockSample = "0.2"
+POMDPXFiles = "0.3"
+SARSOP = "0.5.8"
