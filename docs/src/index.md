@@ -7,7 +7,7 @@
     
 To integrate MOMDPs.jl with other packages in the JuliaPOMDP ecosystem, you can extend key interface functions within those packages (similar to integrations already implemented in SARSOP.jl, POMDPXFiles.jl, etc.).    
 
-To integreate MOMDPs.jl with other packages in the JuliaPOMDP ecosystem, you can extend the required functions within this package. If you want to define your problem as a MOMDP, but use existing solvers, you can use the [`POMDP_of_Discrete_MOMDP`](@ref) type as it ...
+To integrate MOMDPs.jl with other packages in the JuliaPOMDP ecosystem, you can extend the required functions within this package. If you want to define your problem as a MOMDP, but use existing solvers, you can use the [`POMDP_of_Discrete_MOMDP`](@ref) type as it ...
 
 ## What are MOMDPs?
 
