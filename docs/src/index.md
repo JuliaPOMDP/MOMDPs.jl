@@ -5,9 +5,12 @@
 !!! note
     This package is in an initial/early stage. Feedback and contributions are highly encouraged!
     
-To integrate MOMDPs.jl with other packages in the JuliaPOMDP ecosystem, you can extend key interface functions within those packages (similar to integrations already implemented in SARSOP.jl, POMDPXFiles.jl, etc.).    
+To integrate MOMDPs.jl with other packages in the JuliaPOMDP ecosystem, you can extend key interface functions within those packages (similar to integrations already implemented in SARSOP.jl, POMDPXFiles.jl, etc.). 
 
-To integrate MOMDPs.jl with other packages in the JuliaPOMDP ecosystem, you can extend the required functions within this package. If you want to define your problem as a MOMDP, but use existing solvers, you can use the [`POMDP_of_Discrete_MOMDP`](@ref) type as it ...
+If you want to define your problem as a MOMDP and find your desired solver or tool is not yet integrated, you have a few options:
+1. Extend the desired functionality in your desired solver or tool.
+2. If your problem is discrete, you can use the [`POMDP_of_Discrete_MOMDP`](@ref) type as it converts a `MOMDP` to a `POMDP`.
+3. Implement your own conversion using the functions defined for your MOMDP, similar to the conversion implemented for `POMDP_of_Discrete_MOMDP`.
 
 ## What are MOMDPs?
 
