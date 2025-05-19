@@ -10,13 +10,13 @@ struct POMDP_of_Discrete_MOMDP{X,Y,A,O} <: POMDP{Tuple{X,Y},A,O}
 end
 
 POMDPs.states(p::POMDP_of_Discrete_MOMDP) = states(p.momdp)
-POMDPs.stateindex(p::POMDP_of_Discrete_MOMDP, s) = stateindex(p.momdp, s)
+POMDPs.stateindex(p::POMDP_of_Discrete_MOMDP{X,Y,A,O}, s::Tuple{X,Y}) where {X,Y,A,O} = stateindex(p.momdp, s)
 POMDPs.actions(p::POMDP_of_Discrete_MOMDP) = actions(p.momdp)
-POMDPs.actionindex(p::POMDP_of_Discrete_MOMDP, a) = actionindex(p.momdp, a)
-POMDPs.transition(p::POMDP_of_Discrete_MOMDP, s, a) = transition(p.momdp, s, a)
-POMDPs.reward(p::POMDP_of_Discrete_MOMDP, s, a) = reward(p.momdp, s, a)
+POMDPs.actionindex(p::POMDP_of_Discrete_MOMDP{X,Y,A,O}, a::A) where {X,Y,A,O} = actionindex(p.momdp, a)
+POMDPs.transition(p::POMDP_of_Discrete_MOMDP{X,Y,A,O}, s::Tuple{X,Y}, a::A) where {X,Y,A,O} = transition(p.momdp, s, a)
+POMDPs.reward(p::POMDP_of_Discrete_MOMDP{X,Y,A,O}, s::Tuple{X,Y}, a::A) where {X,Y,A,O} = reward(p.momdp, s, a)
 POMDPs.discount(p::POMDP_of_Discrete_MOMDP) = discount(p.momdp)
-POMDPs.isterminal(p::POMDP_of_Discrete_MOMDP, s) = isterminal(p.momdp, s)
+POMDPs.isterminal(p::POMDP_of_Discrete_MOMDP{X,Y,A,O}, s::Tuple{X,Y}) where {X,Y,A,O} = isterminal(p.momdp, s)
 POMDPs.initialstate(p::POMDP_of_Discrete_MOMDP) = initialstate(p.momdp)
 
 """

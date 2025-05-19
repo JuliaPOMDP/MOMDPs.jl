@@ -10,6 +10,7 @@ using SARSOP
 using POMDPXFiles
 
 using Test
+using Aqua
 
 #! These will be removed when SARSOP and POMDPXFiles are updated
 include("sarsop.jl")
@@ -466,4 +467,7 @@ end
         # Clean up
         isfile("test_momdp.pomdpx") && rm("test_momdp.pomdpx")
     end
+    
+    Aqua.test_all(MOMDPs)
+    
 end

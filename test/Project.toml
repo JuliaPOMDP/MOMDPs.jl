@@ -1,4 +1,5 @@
 [deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 POMDPTools = "7588e00f-9cae-40de-98dc-e0c70c48cdd7"
 POMDPXFiles = "c6f6ee83-58c6-5336-a19f-2c76817e1af6"
