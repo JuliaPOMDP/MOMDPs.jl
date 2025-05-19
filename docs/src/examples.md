@@ -173,7 +173,7 @@ As we stated before defining the function, `x_prime` is only dependent on `x` an
 MOMDPs.is_x_prime_dependent_on_y(::RockSampleMOMDP) = false
 ```
 
-[`transition_y`](@ref) Rrturns the distribution over the next hidden state given the current state, action, and next visible state. In RockSample, this transition is also deterministic.
+[`transition_y`](@ref) returns the distribution over the next hidden state given the current state, action, and next visible state. In RockSample, this transition is also deterministic.
 
 ```@example running_example
 function MOMDPs.transition_y(problem::RockSampleMOMDP, s::Tuple{RSPos,SVector{K,Bool}}, a::Int, x_prime::RSPos) where {K}
@@ -229,7 +229,7 @@ function POMDPs.observation(problem::RockSampleMOMDP, a::Int, s::Tuple{RSPos,SVe
 end
 ```
 
-If we wanted to start from any position (and thus the initial distribution would be uniform over the grid), then for the POMDP version we would need to increase our observation space to include the position of the robot. Therefore our observation space size would increae by a factor of $|\mathcal{X}| - 1$ (since we have a terminal state within $\mathcal{X}$). However, for a MOMDP, we do not need those observations, and our observation space would remain as defined.
+If we wanted to start from any position (and thus the initial distribution would be uniform over the grid), then for the POMDP version we would need to increase our observation space to include the position of the robot. Therefore our observation space size would increase by a factor of $|\mathcal{X}| - 1$ (since we have a terminal state within $\mathcal{X}$). However, for a MOMDP, we do not need those observations, and our observation space would remain as defined.
 
 ### Other Functions
 There are no other changes to defining a MOMDP vs the POMDP using the explicit interface. However, we still need to define the reward function, terminal function, and discount factor.

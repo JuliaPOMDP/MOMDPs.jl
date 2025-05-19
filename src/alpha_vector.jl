@@ -117,7 +117,7 @@ function POMDPTools.Policies.value(p::MOMDPAlphaVectorPolicy, b)
         if bxi == 0
             continue
         end
-        # We don't calcualte b_{y|x} here because 
+        # We don't calculate b_{y|x} here because 
         # V(x, b_{y|x}) = 1/b_{x}(x) * max α ⋅ b(x, y)
         #   and 
         # V′(b) = ∑ b_{x}(x) * V(x, b_{y|x})
