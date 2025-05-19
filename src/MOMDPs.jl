@@ -3,13 +3,7 @@ module MOMDPs
 using POMDPs
 using POMDPTools
 using POMDPLinter
-using LinearAlgebra
-using POMDPXFiles
-using ProgressMeter
-using SARSOP
-
-# Needed for reading POMDPX files
-import LightXML: parse_file, root, get_elements_by_tagname, attribute, content
+import LinearAlgebra: dot
 
 """
     Notation matching Ong, Sylvie CW, et al. "POMDPs for robotic tasks with mixed 
@@ -44,16 +38,12 @@ export
     
     POMDP_of_Discrete_MOMDP,
     
-    MOMDPAlphas,
-    read_momdp,
     MOMDPAlphaVectorPolicy
     
-    
+
 include("momdp.jl")
 include("discrete_momdp_functions.jl")
 include("pomdp_of_momdp.jl")
-include("pomdpxfiles.jl")
 include("alpha_vector.jl")
-include("sarsop.jl")
 
 end # module

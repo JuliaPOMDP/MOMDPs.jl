@@ -3,22 +3,14 @@ uuid = "77fc6e33-3f81-4304-8123-5a68e6b3eeb4"
 version = "0.1.0"
 
 [deps]
-LightXML = "9c8b4983-aa76-5018-a973-4c85ecc9e179"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 POMDPLinter = "f3bd98c0-eb40-45e2-9eb1-f2763262d755"
 POMDPTools = "7588e00f-9cae-40de-98dc-e0c70c48cdd7"
-POMDPXFiles = "c6f6ee83-58c6-5336-a19f-2c76817e1af6"
 POMDPs = "a93abf59-7444-517b-a68a-c42f96afdd7d"
-ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
-SARSOP = "cef570c6-3a94-5604-96b7-1a5e143043f2"
 
 [compat]
-LightXML = "0.9"
-LinearAlgebra = "1"
+LinearAlgebra = "1.11.0"
 POMDPLinter = "0.1"
 POMDPTools = "1"
-POMDPXFiles = "0.3"
 POMDPs = "1"
-ProgressMeter = "1.10"
-SARSOP = "0.5.8"
 julia = "1.10"

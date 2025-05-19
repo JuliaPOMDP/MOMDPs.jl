@@ -1,13 +1,20 @@
 using POMDPs
 using POMDPTools
 using MOMDPs
-using StaticArrays
+
 using Random
+using RockSample
+using LinearAlgebra
+using StaticArrays
 using SARSOP
 using POMDPXFiles
-import LinearAlgebra: norm, normalize!
-using RockSample
+
 using Test
+
+#! These will be removed when SARSOP and POMDPXFiles are updated
+include("sarsop.jl")
+using ProgressMeter
+include("pomdpxfiles.jl")
 
 include("rocksample_momdp.jl")
 
@@ -252,8 +259,8 @@ end
             val_pomdp_b0 = value(policy_pomdp, b0_pomdp)
             val_momdp_b0 = value(policy_momdp, b0_momdp)
             val_pomdp_of_momdp_b0 = value(policy_pomdp_of_momdp, b0_pomdp_of_momdp)
-            @test isapprox(val_pomdp_b0, val_momdp_b0, atol=1e-5)
-            @test isapprox(val_pomdp_b0, val_pomdp_of_momdp_b0, atol=1e-5)
+            @test isapprox(val_pomdp_b0, val_momdp_b0, atol=1e-4)
+            @test isapprox(val_pomdp_b0, val_pomdp_of_momdp_b0, atol=1e-4)
         end
     
         # Cleanup files

@@ -1,4 +1,3 @@
-
 """
     write(momdp::MOMDP, pomdpx::AbstractPOMDPXFile)
 
@@ -454,7 +453,26 @@ function reward_xml(momdp::MOMDP, pomdpx::POMDPXFile, out_file::IOStream, p1)
     write(out_file, "\t</RewardFunction>\n\n\n")
 end
 
-#? Does this need to be mutable?
+"""
+    MOMDPAlphas
+
+A structure representing alpha vectors for a MOMDP.
+
+# Fields
+- `alpha_vectors::Matrix{Float64}`: Matrix of alpha vectors, where each column represents an alpha vector
+- `alpha_actions::Vector{Int64}`: Vector of actions associated with each alpha vector (0-indexed)
+- `alpha_visible_states::Vector{Int64}`: Vector of visible states associated with each alpha vector
+
+# Constructors
+- `MOMDPAlphas(av::Matrix{Float64}, aa::Vector{Int64}, avs::Vector{Int64})`: Create with explicit alpha vectors, actions, and visible states
+- `MOMDPAlphas(av::Matrix{Float64})`: Create with alpha vectors only, automatically generating 0-indexed actions
+- `MOMDPAlphas(filename::AbstractString)`: Create by reading policy from a file
+- `MOMDPAlphas()`: Create an empty structure with zero-sized arrays
+
+# Notes
+- The actions are 0-indexed to match SARSOP output format
+- Each alpha vector is associated with a specific action and a specific visible state
+"""
 mutable struct MOMDPAlphas <: Alphas
     alpha_vectors::Matrix{Float64}
     alpha_actions::Vector{Int64}
@@ -482,19 +500,40 @@ mutable struct MOMDPAlphas <: Alphas
     end
 end
 
+"""
+    read_momdp(filename::String)
+
+Read a MOMDP policy from a POMDPX file containing alpha vectors.
+
+This function parses a POMDPX file that contains a policy represented as alpha vectors. The file should have a structure with `Policy` as the root tag, containing `AlphaVector` tags with associated `Vector` elements.
+
+# Arguments
+- `filename::String`: Path to the POMDPX file containing the policy
+
+# Returns
+- `alpha_vectors::Matrix{Float64}`: Matrix of alpha vectors, where each column represents an alpha vector
+- `action_indices::Vector{Int64}`: Vector of action indices associated with each alpha vector
+- `observable_indices::Vector{Int64}`: Vector of observable state indices associated with each alpha vector
+
+# Notes
+- The function expects the POMDPX file to have a specific structure with `Policy`, `AlphaVector`, and `Vector` tags
+- Action and observable state values are converted from strings to integers
+- The alpha vectors are stored as columns in the returned matrix
+- The number of vectors and their length are determined from the XML attributes `numVectors` and `vectorLength`
+"""
 function read_momdp(filename::String)
-    xdoc = parse_file(filename)
+    xdoc = POMDPXFiles.parse_file(filename)
 
     # Get the root of the document (the Policy tag in this case)
-    policy_tag = root(xdoc)
+    policy_tag = POMDPXFiles.root(xdoc)
 
     # Determine expected number of vectors and their length
-    alphavector_tag = get_elements_by_tagname(policy_tag, "AlphaVector")[1]
-    num_vectors = parse(Int64, attribute(alphavector_tag, "numVectors"))
-    vector_length = parse(Int64, attribute(alphavector_tag, "vectorLength"))
+    alphavector_tag = POMDPXFiles.get_elements_by_tagname(policy_tag, "AlphaVector")[1]
+    num_vectors = POMDPXFiles.parse(Int64, POMDPXFiles.attribute(alphavector_tag, "numVectors"))
+    vector_length = POMDPXFiles.parse(Int64, POMDPXFiles.attribute(alphavector_tag, "vectorLength"))
 
     # Arrays with vector tags
-    vector_tags = get_elements_by_tagname(alphavector_tag, "Vector")
+    vector_tags = POMDPXFiles.get_elements_by_tagname(alphavector_tag, "Vector")
 
     # Initialize the gamma matrix. This is basically a matrix with the alpha
     #   vectors as columns.
@@ -505,10 +544,10 @@ function read_momdp(filename::String)
 
     # Fill in gamma
     for vector in vector_tags
-        alpha = parse.(Float64, split(content(vector)))
+        alpha = parse.(Float64, split(POMDPXFiles.content(vector)))
         alpha_vectors[:,gammarow] = alpha
-        alpha_actions[gammarow] = attribute(vector, "action")
-        observable_states[gammarow] = attribute(vector, "obsValue")
+        alpha_actions[gammarow] = POMDPXFiles.attribute(vector, "action")
+        observable_states[gammarow] = POMDPXFiles.attribute(vector, "obsValue")
         gammarow += 1
     end
     
