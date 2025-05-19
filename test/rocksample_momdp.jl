@@ -53,8 +53,9 @@ function MOMDPs.states_y(problem::RockSampleMOMDP{K}) where {K}
     return s_vec_bool_options
 end
 
-
-
+function MOMDPs.stateindex_x(problem::RockSampleMOMDP, s::Tuple{RSPos, SVector{K,Bool}}) where {K}
+    return stateindex_x(problem, s[1])
+end
 function MOMDPs.stateindex_x(problem::RockSampleMOMDP, x::RSPos)
     if isterminal(problem, (x, first(states_y(problem))))
         return length(states_x(problem))
@@ -62,6 +63,9 @@ function MOMDPs.stateindex_x(problem::RockSampleMOMDP, x::RSPos)
     return LinearIndices(problem.map_size)[x[1], x[2]]
 end
 
+function MOMDPs.stateindex_y(problem::RockSampleMOMDP, s::Tuple{RSPos, SVector{K,Bool}}) where {K}
+    return stateindex_y(problem, s[2])
+end
 function MOMDPs.stateindex_y(problem::RockSampleMOMDP, y::SVector{K,Bool}) where {K}
     return findfirst(==(y), states_y(problem))
 end

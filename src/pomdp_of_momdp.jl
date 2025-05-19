@@ -3,7 +3,7 @@
 
 This type is used to convert a Discrete MOMDP into a POMDP. There are functions defined for this POMDP that use the functions defined for the MOMDP type. 
 
-The only difference in the spaces is the observation space. If the original observation space was of size $\mathcal{O}$ and the visible state space was of size $\mathcal{X}$, then the observation space of the POMDP is $\mathcal{X} \times \mathcal{O}$.
+The only difference in the spaces is the observation space. If the original observation space was of size ``\\mathcal{O}`` and the visible state space was of size ``\\mathcal{X}``, then the observation space of the POMDP is ``\\mathcal{X} \\times \\mathcal{O}``.
 """
 struct POMDP_of_Discrete_MOMDP{X,Y,A,O} <: POMDP{Tuple{X,Y},A,O}
     momdp::MOMDP{X,Y,A,O}

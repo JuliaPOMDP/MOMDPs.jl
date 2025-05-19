@@ -1,10 +1,10 @@
 """
-    POMDPs.states(p::MOMDP{X,Y,A,O})
+    POMDPs.states(p::MOMDP)
 
 Helper function to return the full state space for discrete MOMDPs. The states are
     Tuple{X,Y} where X is the visible state and Y is the hidden state.
 """
-function POMDPs.states(p::MOMDP{X,Y,A,O}) where {X,Y,A,O}
+function POMDPs.states(p::MOMDP)
     x_states = states_x(p)
     y_states = states_y(p)
     return vec([(x, y) for x in x_states, y in y_states])
@@ -16,8 +16,8 @@ end
 Helper function to return the index of the Tuple{X,Y} state for discrete MOMDPs.
 """
 function POMDPs.stateindex(p::MOMDP{X,Y,A,O}, s::Tuple{X,Y}) where {X,Y,A,O}
-    x_idx = stateindex_x(p, s[1])
-    y_idx = stateindex_y(p, s[2])
+    x_idx = stateindex_x(p, s)
+    y_idx = stateindex_y(p, s)
     n_states_x = length(states_x(p))
     n_states_y = length(states_y(p))
     return LinearIndices((n_states_x, n_states_y))[x_idx, y_idx]
