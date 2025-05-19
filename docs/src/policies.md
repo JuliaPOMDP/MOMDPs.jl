@@ -12,7 +12,7 @@ For the action map (`action_map`), we also have a vector of size $|\mathcal{X}|$
 
 ## Value Function
 
-With an alpha vector policy represented as `MOMDPAlphaVectorPolicy` (a collection of alpha vector sets), can use our visible state to determine the appropriate set and then and then find the maximum alpha vector in the set
+With an alpha vector policy represented as `MOMDPAlphaVectorPolicy` (a collection of alpha vector sets), can use our visible state to determine the appropriate set and then find the maximum alpha vector in the set
 $$V(x, b_{\mathcal{Y}}) = \max_{\alpha \in \Gamma_{y(x)}} \{\alpha \cdot b_{\mathcal{Y}} \}$$
 [`value(p::MOMDPAlphaVectorPolicy, b, x)`](@ref) is provided to evaluate a `MOMDPAlphaVectorPolicy` with a known visible state `x`.
 
