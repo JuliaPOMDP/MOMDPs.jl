@@ -1,11 +1,9 @@
-# MOMDPs
-
-[![CI](https://github.com/JuliaPOMDP/MOMDPs.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaPOMDP/MOMDPs.jl/actions/workflows/CI.yml)
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaPOMDP.github.io/MOMDPs.jl/stable)
-[![codecov](https://codecov.io/gh/JuliaPOMDP/MOMDPs.jl/graph/badge.svg?token=2CywyuM9Hw)](https://codecov.io/gh/JuliaPOMDP/MOMDPs.jl)
-[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+# MOMDPs.jl
 
 **MOMDPs.jl** provides structures and tools for Mixed Observability Markov Decision Processes (MOMDPs) in Julia. It is built on top of the [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl) framework, extending its functionality to a factorized state space composed of a fully observed state and a partially observed state.
+
+!!! note
+    This package is in an initial/early stage. Feedback and contributions are highly encouraged!
     
 To integrate MOMDPs.jl with other packages in the JuliaPOMDP ecosystem, you can extend key interface functions within those packages (similar to integrations already implemented in SARSOP.jl, POMDPXFiles.jl, etc.). 
 
@@ -22,7 +20,9 @@ Throughout this package, we will use the notation from [Ong, Sylvie CW, et al. "
 
 We assume the MOMDP is of the following form (same diagram as from Figure 1 in Ong et al. 2009):
 
-<img src="docs/src/images/momdp_diagram.svg" alt="MOMDP Diagram" style="width: 40%;">
+```@raw html
+<img src="images/momdp_diagram.svg" alt="MOMDP Diagram" style="width: 40%;">
+```
 
 A MOMDP is specified by the tuple $(\mathcal{X}, \mathcal{Y}, \mathcal{A}, \mathcal{O}, T_x, T_y, O, R, γ)$, where
 -  $\mathcal{X}$ is the set of fully observed states
@@ -43,3 +43,11 @@ You can install MOMDPs.jl using the Julia package manager:
 ```
  
 MOMDPs.jl is built on top of POMDPs.jl and extends various other packages in the JuliaPOMDP ecosystem. When using MOMDPs.jl, you will also need these other packages. As a default, we recommend including `POMDPs` and `POMDPTools`.
+
+## Documentation Outline
+
+
+```@contents
+Pages = reduce(vcat, map(last, Main.page_order))
+Depth = 3
+```
