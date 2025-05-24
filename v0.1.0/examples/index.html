@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · MOMDPs.jl</title><meta name="title" content="Examples · MOMDPs.jl"/><meta property="og:title" content="Examples · MOMDPs.jl"/><meta property="twitter:title" content="Examples · MOMDPs.jl"/><meta name="description" content="Documentation for MOMDPs.jl."/><meta property="og:description" content="Documentation for MOMDPs.jl."/><meta property="twitter:description" content="Documentation for MOMDPs.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">MOMDPs.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">MOMDPs.jl</a></li><li><a class="tocitem" href="../defining_momdp/">Defining a MOMDP</a></li><li><a class="tocitem" href="../policies/">Policies</a></li><li><a class="tocitem" href="../discrete_momdp_functions/">Discrete Helper Functions</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#RockSample"><span>RockSample</span></a></li><li><a class="tocitem" href="#Solving-using-SARSOP"><span>Solving using SARSOP</span></a></li><li><a class="tocitem" href="#Converting-to-a-POMDP"><span>Converting to a POMDP</span></a></li></ul></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaPOMDP/MOMDPs.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaPOMDP/MOMDPs.jl/blob/master/docs/src/examples.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><p>The process of defining, solving, and evaluating a MOMDP closely mirrors the steps for a POMDP, differing primarily in the function definitions required.</p><h2 id="RockSample"><a class="docs-heading-anchor" href="#RockSample">RockSample</a><a id="RockSample-1"></a><a class="docs-heading-anchor-permalink" href="#RockSample" title="Permalink"></a></h2><p>We will use the classic Rock Sample problem to demonstrate forming a MOMDP, solving it with SARSOP, and evaluating the policy. Since RockSample is already defined as a POMDP in <code>RockSample.jl</code>, we will reuse existing definitions where possible and focus on the MOMDP-specific aspects.</p><h3 id="RockSampleMOMDP-Type"><a class="docs-heading-anchor" href="#RockSampleMOMDP-Type">RockSampleMOMDP Type</a><a id="RockSampleMOMDP-Type-1"></a><a class="docs-heading-anchor-permalink" href="#RockSampleMOMDP-Type" title="Permalink"></a></h3><p>We define the MOMDP type similarly to the existing POMDP and provide a constructor from the POMDP type.</p><pre><code class="language-julia hljs">using POMDPs
+using POMDPTools
+using MOMDPs
+using Printf
+using LinearAlgebra
+using RockSample
+using StaticArrays # for SVector
+
+mutable struct RockSampleMOMDP{K} &lt;: MOMDP{RSPos,SVector{K,Bool},Int,Int}
+    map_size::Tuple{Int,Int}
+    rocks_positions::SVector{K,RSPos}
+    init_pos::RSPos
+    sensor_efficiency::Float64
+    bad_rock_penalty::Float64
+    good_rock_reward::Float64
+    step_penalty::Float64
+    sensor_use_penalty::Float64
+    exit_reward::Float64
+    terminal_state::RSPos
+    discount_factor::Float64
+end
+
+&quot;&quot;&quot;
+    RockSampleMOMDP(rocksample_pomdp::RockSamplePOMDP)
+
+Create a RockSampleMOMDP using the same parameters in a RockSamplePOMDP.
+&quot;&quot;&quot;
+function RockSampleMOMDP(rocksample_pomdp::RockSamplePOMDP)
+    return RockSampleMOMDP(
+        rocksample_pomdp.map_size,
+        rocksample_pomdp.rocks_positions,
+        rocksample_pomdp.init_pos,
+        rocksample_pomdp.sensor_efficiency,
+        rocksample_pomdp.bad_rock_penalty,
+        rocksample_pomdp.good_rock_reward,
+        rocksample_pomdp.step_penalty,
+        rocksample_pomdp.sensor_use_penalty,
+        rocksample_pomdp.exit_reward,
+        rocksample_pomdp.terminal_state.pos,
+        rocksample_pomdp.discount_factor
+    )
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Main.RockSampleMOMDP</code></pre><h3 id="State-Space"><a class="docs-heading-anchor" href="#State-Space">State Space</a><a id="State-Space-1"></a><a class="docs-heading-anchor-permalink" href="#State-Space" title="Permalink"></a></h3><p>In RockSample, the robot knows its location but observes only rock states. Thus, grid locations form the visible state and rock states form the hidden state.</p><pre><code class="language-julia hljs"># Visible states: All possible grid locations and a terminal state
+function MOMDPs.states_x(problem::RockSampleMOMDP)
+    map_states = vec([SVector{2,Int}((i, j)) for i in 1:problem.map_size[1], j in 1:problem.map_size[2]])
+    push!(map_states, problem.terminal_state) # Add terminal state
+    return map_states
+end
+
+# Hidden states: All possible K-length vector of booleans, where K is the number of rocks
+function MOMDPs.states_y(problem::RockSampleMOMDP{K}) where {K}
+    bool_options = [[true, false] for _ in 1:K]
+    vec_bool_options = vec(collect(Iterators.product(bool_options...)))
+    s_vec_bool_options = [SVector{K,Bool}(bool_vec) for bool_vec in vec_bool_options]
+    return s_vec_bool_options
+end</code></pre><h4 id="State-Indexing"><a class="docs-heading-anchor" href="#State-Indexing">State Indexing</a><a id="State-Indexing-1"></a><a class="docs-heading-anchor-permalink" href="#State-Indexing" title="Permalink"></a></h4><p>For certain solvers, we also need the <code>stateindex</code> function defined. For MOMDPs, we need to define it for both the visible and hidden states.</p><pre><code class="language-julia hljs">function MOMDPs.stateindex_x(problem::RockSampleMOMDP, s::Tuple{RSPos, SVector{K,Bool}}) where {K}
+    return stateindex_x(problem, s[1])
+end
+function MOMDPs.stateindex_x(problem::RockSampleMOMDP, x::RSPos)
+    if isterminal(problem, (x, first(states_y(problem))))
+        return length(states_x(problem))
+    end
+    return LinearIndices(problem.map_size)[x[1], x[2]]
+end
+
+function MOMDPs.stateindex_y(problem::RockSampleMOMDP, s::Tuple{RSPos, SVector{K,Bool}}) where {K}
+    return stateindex_y(problem, s[2])
+end
+function MOMDPs.stateindex_y(problem::RockSampleMOMDP, y::SVector{K,Bool}) where {K}
+    return findfirst(==(y), states_y(problem))
+end</code></pre><h4 id="Initial-State-Distributions"><a class="docs-heading-anchor" href="#Initial-State-Distributions">Initial State Distributions</a><a id="Initial-State-Distributions-1"></a><a class="docs-heading-anchor-permalink" href="#Initial-State-Distributions" title="Permalink"></a></h4><p>Similarly, we need to define the initial distribution over both the visible and hidden states. We can start with any distribution over the visible states, but in RockSample, we start at the <code>init_pos</code> defined in the problem.</p><pre><code class="language-julia hljs">function MOMDPs.initialstate_x(problem::RockSampleMOMDP)
+    return Deterministic(problem.init_pos)
+end</code></pre><p>The distribution over hidden states is conditioned on the visible state. Therefore, <a href="../api/#MOMDPs.initialstate_y"><code>initialstate_y</code></a> has <code>x</code> as an input argument.</p><pre><code class="language-julia hljs">function MOMDPs.initialstate_y(::RockSampleMOMDP{K}, x::RSPos) where K
+    probs = normalize!(ones(2^K), 1)
+    states = Vector{SVector{K,Bool}}(undef, 2^K)
+    for (i,rocks) in enumerate(Iterators.product(ntuple(x-&gt;[false, true], K)...))
+        states[i] = SVector(rocks)
+    end
+    return SparseCat(states, probs)
+end</code></pre><p>Notice that we didn&#39;t use <code>x</code> in the function <code>initialstate_y</code>. In RockSample, the initial distribution over the rock states is independent of the robot position. Therefore, we can set <a href="../api/#MOMDPs.is_initial_distribution_independent"><code>is_initial_distribution_independent</code></a> to <code>true</code>.</p><pre><code class="language-julia hljs">MOMDPs.is_initial_distribution_independent(::RockSampleMOMDP) = true</code></pre><div class="admonition is-info" id="Note-88ae742289eda8b3"><header class="admonition-header">Note<a class="admonition-anchor" href="#Note-88ae742289eda8b3" title="Permalink"></a></header><div class="admonition-body"><p>If we plan on using the POMDPs.jl ecosystem, we still need to define <a href="../api/#POMDPs.initialstate-Union{Tuple{MOMDP{X, Y, A, O}}, Tuple{O}, Tuple{A}, Tuple{Y}, Tuple{X}} where {X, Y, A, O}"><code>initialstate(p::MOMDP)</code></a>. However, since our problem is discrete, we can use the <code>initialstate(p::MOMDP)</code> function defined in <code>discrete_momdp_functions.jl</code> using <code>initialstate_x</code> and <code>initialstate_y</code>.</p></div></div><h3 id="Action-Space"><a class="docs-heading-anchor" href="#Action-Space">Action Space</a><a id="Action-Space-1"></a><a class="docs-heading-anchor-permalink" href="#Action-Space" title="Permalink"></a></h3><p>There is no change in our action space from the POMDP version.</p><pre><code class="language-julia hljs">POMDPs.actions(::RockSampleMOMDP{K}) where {K} = 1:RockSample.N_BASIC_ACTIONS+K
+POMDPs.actionindex(::RockSampleMOMDP, a::Int) = a</code></pre><h3 id="Transition-Funtions"><a class="docs-heading-anchor" href="#Transition-Funtions">Transition Funtions</a><a id="Transition-Funtions-1"></a><a class="docs-heading-anchor-permalink" href="#Transition-Funtions" title="Permalink"></a></h3><p>For the transition function, we need to define both <a href="../api/#MOMDPs.transition_x"><code>transition_x</code></a> and <a href="../api/#MOMDPs.transition_y"><code>transition_y</code></a>. As a reminder, <code>transition_x</code> returns the distribution over the next visible state given the current state and action where the current state is defined as the tuple <code>(x,y)</code>.</p><p>For RockSample, it is a deterministic transition based on the action selected and the current visible state. We will use a similar helper function <code>next_position</code> as in the POMDP version.</p><pre><code class="language-julia hljs">function next_position(s::RSPos, a::Int)
+    if a &gt; RockSample.N_BASIC_ACTIONS || a == 1
+        # robot check rocks or samples
+        return s
+    elseif a &lt;= RockSample.N_BASIC_ACTIONS
+        # the robot moves
+        return s + RockSample.ACTION_DIRS[a]
+    end
+end
+
+function MOMDPs.transition_x(problem::RockSampleMOMDP, s::Tuple{RSPos,SVector{K,Bool}}, a::Int) where {K}
+    x = s[1]
+    if isterminal(problem, s)
+        return Deterministic(problem.terminal_state)
+    end
+    new_pos = next_position(x, a)
+    if new_pos[1] &gt; problem.map_size[1]
+        new_pos = problem.terminal_state
+    else
+        new_pos = RSPos(clamp(new_pos[1], 1, problem.map_size[1]),
+            clamp(new_pos[2], 1, problem.map_size[2]))
+    end
+    return Deterministic(new_pos)
+end</code></pre><p>As we stated before defining the function, <code>x_prime</code> is only dependent on <code>x</code> and the action. Therefore, we can set <a href="../api/#MOMDPs.is_x_prime_dependent_on_y"><code>is_x_prime_dependent_on_y</code></a> to <code>false</code>.</p><pre><code class="language-julia hljs">MOMDPs.is_x_prime_dependent_on_y(::RockSampleMOMDP) = false</code></pre><p><a href="../api/#MOMDPs.transition_y"><code>transition_y</code></a> returns the distribution over the next hidden state given the current state, action, and next visible state. In RockSample, this transition is also deterministic.</p><pre><code class="language-julia hljs">function MOMDPs.transition_y(problem::RockSampleMOMDP, s::Tuple{RSPos,SVector{K,Bool}}, a::Int, x_prime::RSPos) where {K}
+    if isterminal(problem, s)
+        return Deterministic(s[2])
+    end
+
+    if a == RockSample.BASIC_ACTIONS_DICT[:sample] &amp;&amp; in(s[1], problem.rocks_positions)
+        rock_ind = findfirst(isequal(s[1]), problem.rocks_positions)
+        new_rocks = MVector{K,Bool}(undef)
+        for r = 1:K
+            new_rocks[r] = r == rock_ind ? false : s[2][r]
+        end
+        new_rocks = SVector(new_rocks)
+
+    else # We didn&#39;t sample, so states of rocks remain unchanged
+        new_rocks = s[2]
+    end
+
+    return Deterministic(new_rocks)
+end</code></pre><p>Norice in our <code>transition_y</code> for RockSample that we did not use <code>x_prime</code> in the function. Therefore, we know the distritbuion of <code>y_prime</code> is conditionally independent of <code>x_prime</code> given the current state and action. Thus we can set <a href="../api/#MOMDPs.is_y_prime_dependent_on_x_prime"><code>is_y_prime_dependent_on_x_prime</code></a> to <code>false</code>.</p><pre><code class="language-julia hljs">MOMDPs.is_y_prime_dependent_on_x_prime(::RockSampleMOMDP) = false</code></pre><h3 id="Observation-Space"><a class="docs-heading-anchor" href="#Observation-Space">Observation Space</a><a id="Observation-Space-1"></a><a class="docs-heading-anchor-permalink" href="#Observation-Space" title="Permalink"></a></h3><p>In RockSample, we started with a known initial position of our robot and then the robot transitions in the grid are deterministic. Therefore, the location is always known through belief updates without needing an observation. The only observations needed in the POMDP version and in the MOMDP version are the results on the sensor.</p><pre><code class="language-julia hljs">POMDPs.observations(::RockSampleMOMDP) = 1:3
+POMDPs.obsindex(::RockSampleMOMDP, o::Int) = o
+
+function POMDPs.observation(problem::RockSampleMOMDP, a::Int, s::Tuple{RSPos,SVector{K,Bool}}) where {K}
+    if a &lt;= RockSample.N_BASIC_ACTIONS
+        # no obs
+        return SparseCat((1, 2, 3), (0.0, 0.0, 1.0))
+    else
+        rock_ind = a - RockSample.N_BASIC_ACTIONS
+        rock_pos = problem.rocks_positions[rock_ind]
+        dist = norm(rock_pos - s[1])
+        efficiency = 0.5 * (1.0 + exp(-dist * log(2) / problem.sensor_efficiency))
+        rock_state = s[2][rock_ind]
+        if rock_state
+            return SparseCat((1, 2, 3), (efficiency, 1.0 - efficiency, 0.0))
+        else
+            return SparseCat((1, 2, 3), (1.0 - efficiency, efficiency, 0.0))
+        end
+    end
+end</code></pre><p>If we wanted to start from any position (and thus the initial distribution would be uniform over the grid), then for the POMDP version we would need to increase our observation space to include the position of the robot. Therefore our observation space size would increase by a factor of <span>$|\mathcal{X}| - 1$</span> (since we have a terminal state within <span>$\mathcal{X}$</span>). However, for a MOMDP, we do not need those observations, and our observation space would remain as defined.</p><h3 id="Other-Functions"><a class="docs-heading-anchor" href="#Other-Functions">Other Functions</a><a id="Other-Functions-1"></a><a class="docs-heading-anchor-permalink" href="#Other-Functions" title="Permalink"></a></h3><p>There are no other changes to defining a MOMDP vs the POMDP using the explicit interface. However, we still need to define the reward function, terminal function, and discount factor.</p><pre><code class="language-julia hljs">function POMDPs.reward(problem::RockSampleMOMDP, s::Tuple{RSPos,SVector{K,Bool}}, a::Int) where {K}
+    r = problem.step_penalty
+    if next_position(s[1], a)[1] &gt; problem.map_size[1]
+        r += problem.exit_reward
+        return r
+    end
+
+    if a == RockSample.BASIC_ACTIONS_DICT[:sample] &amp;&amp; in(s[1], problem.rocks_positions) # sample
+        rock_ind = findfirst(isequal(s[1]), problem.rocks_positions) # slow ?
+        r += s[2][rock_ind] ? problem.good_rock_reward : problem.bad_rock_penalty
+    elseif a &gt; RockSample.N_BASIC_ACTIONS # using senssor
+        r += problem.sensor_use_penalty
+    end
+    return r
+end
+
+function POMDPs.isterminal(problem::RockSampleMOMDP, s::Tuple{RSPos,SVector{K,Bool}}) where {K}
+    return s[1] == problem.terminal_state
+end
+
+POMDPs.discount(problem::RockSampleMOMDP) = problem.discount_factor</code></pre><h2 id="Solving-using-SARSOP"><a class="docs-heading-anchor" href="#Solving-using-SARSOP">Solving using SARSOP</a><a id="Solving-using-SARSOP-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-using-SARSOP" title="Permalink"></a></h2><p>Now that we have defined our MOMDP, we can solve it with SARSOP. We will create a POMDP RockSample problem and then a MOMDP RockSample problem from the POMDP since our constructor was defined with the POMDP type. Since we have the POMDP, we will also solve the POMDP using SARSOP so we can compare the policies.</p><div class="admonition is-info" id="Note-ca2ca1d3d0831462"><header class="admonition-header">Note<a class="admonition-anchor" href="#Note-ca2ca1d3d0831462" title="Permalink"></a></header><div class="admonition-body"><p>SARSOP.jl and POMDPXFiles.jl have not been updated to work wtih MOMDPs.jl. We must include <code>test/pomdpxfiles.jl</code> and <code>test/sarsop.jl</code> until the packages are updated. This note will be removed and the examples will be updated when the packages are updated.</p></div></div><pre><code class="language-julia hljs">using SARSOP
+using POMDPXFiles
+using ProgressMeter
+
+include(&quot;../../test/sarsop.jl&quot;)
+include(&quot;../../test/pomdpxfiles.jl&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Main.read_momdp</code></pre><pre><code class="language-julia hljs"># Create a smaller RockSample problem
+rocksample_pomdp = RockSample.RockSamplePOMDP(
+    map_size=(3, 3),
+    rocks_positions=[(2, 2), (3, 3), (1, 2)],
+    init_pos=(1, 1),
+    sensor_efficiency=0.5
+)
+rocksample_momdp = RockSampleMOMDP(rocksample_pomdp)
+
+# Instantiate the solver
+solver_pomdp = SARSOPSolver(; precision=1e-2, timeout=30,
+    pomdp_filename=&quot;test_rocksample_pomdp.pomdpx&quot;, verbose=false)
+solver_momdp = SARSOPSolver(; precision=1e-2, timeout=30,
+    pomdp_filename=&quot;test_rocksample_momdp.pomdpx&quot;, verbose=false)
+
+# Solve the POMDP and the MOMDP
+policy_pomdp = solve(solver_pomdp, rocksample_pomdp)
+policy_momdp = solve(solver_momdp, rocksample_momdp)
+
+# Evaluate the policies at the initial belief
+b0_pomdp = initialstate(rocksample_pomdp)
+b0_momdp = initialstate(rocksample_momdp)
+
+val_pomdp_b0 = value(policy_pomdp, b0_pomdp)
+val_momdp_b0 = value(policy_momdp, b0_momdp)
+
+@printf(&quot;Value of POMDP policy: %.4f\n&quot;, val_pomdp_b0)
+@printf(&quot;Value of MOMDP policy: %.4f\n&quot;, val_momdp_b0)
+
+# What is the action of the policies at the initial belief?
+a_pomdp_b0 = action(policy_pomdp, b0_pomdp)
+a_momdp_b0 = action(policy_momdp, b0_momdp)
+
+@printf(&quot;Action of POMDP policy: %d\n&quot;, a_pomdp_b0)
+@printf(&quot;Action of MOMDP policy: %d\n&quot;, a_momdp_b0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32">Progress:   0%|                                         |  ETA: 0:00:21</span><span class="sgr32">Progress: 100%|█████████████████████████████████████████| Time: 0:00:00</span>
+POMDPX file written successfully.
+Value of POMDP policy: 18.2751
+Value of MOMDP policy: 18.2751
+Action of POMDP policy: 2
+Action of MOMDP policy: 2</code></pre><h2 id="Converting-to-a-POMDP"><a class="docs-heading-anchor" href="#Converting-to-a-POMDP">Converting to a POMDP</a><a id="Converting-to-a-POMDP-1"></a><a class="docs-heading-anchor-permalink" href="#Converting-to-a-POMDP" title="Permalink"></a></h2><p>If you have a problem defined as a MOMDP, you can convert it to an equivalent POMDP. If your problem is discrete, you can use the <a href="../defining_momdp/#POMDP_of_Discrete_MOMDP"><code>POMDP_of_Discrete_MOMDP</code></a> type. </p><pre><code class="language-julia hljs">rocksample_pomdp_from_momdp = POMDP_of_Discrete_MOMDP(rocksample_momdp)
+
+solver_pomdp_from_momdp = SARSOPSolver(; precision=1e-2, timeout=30,
+    pomdp_filename=&quot;test_rocksample_momdp.pomdpx&quot;, verbose=false)
+
+policy_pomdp_from_momdp = solve(solver_pomdp_from_momdp, rocksample_pomdp_from_momdp)
+
+b0_pomdp_from_momdp = initialstate(rocksample_pomdp_from_momdp)
+val_pomdp_from_momdp_b0 = value(policy_pomdp_from_momdp, b0_pomdp_from_momdp)
+
+@printf(&quot;Value of POMDP generated from MOMDP: %.4f\n&quot;, val_pomdp_from_momdp_b0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32">Progress:   0%|                                         |  ETA: 0:01:54</span><span class="sgr32">Progress:   0%|                                         |  ETA: 0:00:59</span><span class="sgr32">Progress:   1%|▎                                        |  ETA: 0:00:31</span><span class="sgr32">Progress: 100%|█████████████████████████████████████████| Time: 0:00:00</span>
+Value of POMDP generated from MOMDP: 18.2751</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../discrete_momdp_functions/">« Discrete Helper Functions</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.11.4 on <span class="colophon-date" title="Saturday 24 May 2025 22:17">Saturday 24 May 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
