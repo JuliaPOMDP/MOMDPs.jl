@@ -36,10 +36,10 @@ A MOMDP is specified by the tuple $(\mathcal{X}, \mathcal{Y}, \mathcal{A}, \math
 -  $\gamma$ is the discount factor.
 
 ## Installation
-
-You can install MOMDPs.jl using the Julia package manager:
+Use `]` to get to the package manager to add the package. 
 ```julia
-] add "git@github.com:JuliaPOMDP/MOMDPs.jl.git"
+julia> ]
+pkg> add MOMDPs
 ```
  
 MOMDPs.jl is built on top of POMDPs.jl and extends various other packages in the JuliaPOMDP ecosystem. When using MOMDPs.jl, you will also need these other packages. As a default, we recommend including `POMDPs` and `POMDPTools`.
