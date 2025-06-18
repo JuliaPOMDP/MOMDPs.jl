@@ -48,6 +48,7 @@ POMDPTools.Policies.action(p::MOMDPAlphaVectorPolicy, b)
 POMDPTools.Policies.action(p::MOMDPAlphaVectorPolicy, b, x)
 POMDPTools.Policies.actionvalues(p::MOMDPAlphaVectorPolicy, b, x)
 POMDPTools.BeliefUpdaters.initialize_belief(bu::MOMDPDiscreteUpdater, dist::Any)
+POMDPTools.BeliefUpdaters.update(bu::MOMDPDiscreteUpdater, b::DiscreteBelief, a, o, x, xp)
 POMDPTools.BeliefUpdaters.update(bu::MOMDPDiscreteUpdater, b::Any, a, o, x, xp)
 ```
 

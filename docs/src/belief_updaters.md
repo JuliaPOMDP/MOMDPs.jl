@@ -1,10 +1,10 @@
 # Belief Updaters
 
-The only updater currently implemented is the [`MOMDPDiscreteUpdater`](@ref).
+The only updater currently implemented is the [`MOMDPs.MOMDPDiscreteUpdater`](@ref).
 
 ## `MOMDPDiscreteUpdater`
 
-The [`MOMDPDiscreteUpdater`](@ref) is a discrete belief updater for MOMDPs. The [`update`](@ref) function implements the discrete Bayesian filter for MOMDPs, which updates beliefs over hidden states given knowledge of visible state transitions. The `update` function requires the current belief `b`, the action taken `a`, the observation received `o`, the visible state from which the action was taken `x`, and the visible state that we transitioned to `xp`.
+The [`MOMDPs.MOMDPDiscreteUpdater`](@ref) is a discrete belief updater for MOMDPs. The [`update`](@ref) function implements the discrete Bayesian filter for MOMDPs, which updates beliefs over hidden states given knowledge of visible state transitions. The `update` function requires the current belief `b`, the action taken `a`, the observation received `o`, the visible state from which the action was taken `x`, and the visible state that we transitioned to `xp`.
 
 ### Example Usage
 ```julia

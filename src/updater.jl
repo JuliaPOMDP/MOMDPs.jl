@@ -167,17 +167,7 @@ Update a discrete belief over hidden states using the MOMDP belief update equati
 
 # Description
 This function implements the discrete Bayesian filter for MOMDPs, which updates beliefs
-over hidden states given knowledge of visible state transitions. The update equation is:
-
-```math
-b'(y') \\propto \\eta \\sum_y O(o | x, y, a, x', y') \\cdot T_y(y' | x, y, a, x') \\cdot b(y)
-```
-
-where:
-- `b'(y')` is the updated belief probability for hidden state `y'`
-- `O(o | x, y, a, x', y')` is the observation probability given states and action
-- `T_y(y' | x, y, a, x')` is the hidden state transition probability
-- `b(y)` is the current belief probability for hidden state `y`
+over hidden states given knowledge of visible state transitions.
 
 The function iterates through all current hidden states with non-zero probability,
 computes transition probabilities to next hidden states, weights by observation
@@ -230,20 +220,6 @@ end
 """
     update(bu::MOMDPDiscreteUpdater, b::Any, a, o, x, xp)
 
-Update a belief of any type by first converting it to a discrete belief, then updating.
-
-# Arguments
-- `bu::MOMDPDiscreteUpdater`: The MOMDP discrete belief updater
-- `b::Any`: The current belief (will be converted to discrete belief if needed)
-- `a`: The action taken
-- `o`: The observation received after taking action `a`
-- `x`: The previous visible state
-- `xp`: The current visible state
-
-# Returns
-- A new `DiscreteBelief` representing the updated belief over hidden states
-
-# Description
 This is a convenience method that handles arbitrary belief types by first calling
 `initialize_belief` to convert them to a `DiscreteBelief`, then performing the
 standard discrete belief update.
