@@ -454,8 +454,369 @@ end
         # Test value function
         v = value(policy, b)
         @test v > 0
+        
+        # Test action selection based on known visible state
+        b = SparseCat([first(states_y(momdp))], [1.0])
+        a = action(policy, b, s_x)
+        @test a == 1
     end
 
+    @testset "MOMDPDiscreteUpdater Tests" begin
+        _, momdp, _ = create_test_rocksample()
+        
+        # Test updater creation
+        @testset "Updater Creation" begin
+            updater = MOMDPDiscreteUpdater(momdp)
+            @test updater.momdp === momdp
+            @test isa(updater, MOMDPDiscreteUpdater)
+        end
+        
+        # Test uniform belief creation
+        @testset "Uniform Belief Creation" begin
+            updater = MOMDPDiscreteUpdater(momdp)
+            
+            # Test with updater
+            b_uniform = uniform_belief_y(updater)
+            @test isa(b_uniform, DiscreteBelief)
+            @test length(b_uniform.b) == length(states_y(momdp))
+            @test all(b_uniform.b .≈ 1.0 / length(states_y(momdp)))
+            @test sum(b_uniform.b) ≈ 1.0
+            
+            # Test with momdp directly
+            b_uniform2 = uniform_belief_y(momdp)
+            @test b_uniform.b ≈ b_uniform2.b
+        end
+        
+        # Test belief initialization
+        @testset "Belief Initialization" begin
+            updater = MOMDPDiscreteUpdater(momdp)
+            
+            # Test with SparseCat distribution
+            states_y_list = ordered_states_y(momdp)
+            sparse_dist = SparseCat([states_y_list[1], states_y_list[3]], [0.7, 0.3])
+            b_sparse = initialize_belief(updater, sparse_dist)
+            
+            @test isa(b_sparse, DiscreteBelief)
+            @test sum(b_sparse.b) ≈ 1.0
+            @test b_sparse.b[1] ≈ 0.7  # First hidden state
+            @test b_sparse.b[2] ≈ 0.0  # Second hidden state (not in sparse support)
+            @test b_sparse.b[3] ≈ 0.3  # Third hidden state
+            
+            # Test with uniform distribution
+            uniform_dist = uniform_belief_y(momdp)
+            b_from_uniform = initialize_belief(updater, uniform_dist)
+            @test b_from_uniform.b ≈ uniform_dist.b
+        end
+        
+        # Test belief updates
+        @testset "Belief Updates" begin
+            updater = MOMDPDiscreteUpdater(momdp)
+            
+            # Create initial belief
+            b_initial = uniform_belief_y(updater)
+            
+            # Test parameters for update
+            x = SVector{2,Int}((1, 1))  # Initial visible state
+            xp = SVector{2,Int}((2, 1)) # Next visible state (moved east)
+            a = 3  # Move east action
+            o = 3  # No observation (movement)
+            
+            # Perform update
+            b_updated = update(updater, b_initial, a, o, x, xp)
+            
+            @test isa(b_updated, DiscreteBelief)
+            @test sum(b_updated.b) ≈ 1.0
+            @test length(b_updated.b) == length(b_initial.b)
+            
+            # Test that belief changes appropriately
+            # For movement without sampling, hidden states should remain unchanged
+            # (since rocks don't change when moving)
+            @test b_updated.b ≈ b_initial.b
+            
+            # Test update with rock sampling
+            x_at_rock = SVector{2,Int}((1, 3))  # Position of second rock
+            a_sample = 1  # Sample action
+            o_sample = 3  # No observation from sampling
+            
+            # Create belief with some structure
+            b_temp = zeros(length(states_y(momdp)))
+            b_temp[1] = 0.1
+            b_temp[2] = 0.6
+            b_temp[3] = 0.3
+            b_structured = DiscreteBelief(momdp, ordered_states_y(momdp), b_temp)
+            b_after_sample = update(updater, b_structured, a_sample, o_sample, x_at_rock, x_at_rock)
+            
+            @test isa(b_after_sample, DiscreteBelief)
+            @test sum(b_after_sample.b) ≈ 1.0
+            # After sampling at rock 2, the belief should reflect that rock 2 is now bad
+        end
+        
+        # Test update with observation
+        @testset "Update with Sensor Observations" begin
+            updater = MOMDPDiscreteUpdater(momdp)
+            
+            # Create initial belief
+            b_initial = uniform_belief_y(updater)
+            
+            # Test sensing first rock
+            x = SVector{2,Int}((1, 1))  # Initial position
+            a_sense = 6  # Sense first rock action
+            o_good = 1   # Good rock observation
+            o_bad = 2    # Bad rock observation
+            
+            # Update with good observation
+            b_good = update(updater, b_initial, a_sense, o_good, x, x)
+            @test isa(b_good, DiscreteBelief)
+            @test sum(b_good.b) ≈ 1.0
+            
+            # Update with bad observation
+            b_bad = update(updater, b_initial, a_sense, o_bad, x, x)
+            @test isa(b_bad, DiscreteBelief)
+            @test sum(b_bad.b) ≈ 1.0
+            
+            # The beliefs should be different
+            @test !(b_good.b ≈ b_bad.b)
+        end
+        
+        # Test convenience update method
+        @testset "Convenience Update Method" begin
+            updater = MOMDPDiscreteUpdater(momdp)
+            
+            # Create a SparseCat belief
+            states_y_list = collect(states_y(momdp))
+            sparse_belief = SparseCat([states_y_list[1]], [1.0])
+            
+            x = SVector{2,Int}((1, 1))
+            xp = SVector{2,Int}((2, 1))
+            a = 3  # Move east
+            o = 3  # No observation
+            
+            # This should work with the convenience method
+            b_updated = update(updater, sparse_belief, a, o, x, xp)
+            @test isa(b_updated, DiscreteBelief)
+            @test sum(b_updated.b) ≈ 1.0
+            
+            # Should be equivalent to explicit conversion
+            b_converted = initialize_belief(updater, sparse_belief)
+            b_updated_explicit = update(updater, b_converted, a, o, x, xp)
+            @test b_updated.b ≈ b_updated_explicit.b
+        end
+        
+        # Test error conditions
+        @testset "Error Conditions" begin
+            updater = MOMDPDiscreteUpdater(momdp)
+            
+            # Create a belief that will lead to impossible observation
+            states_y_list = collect(states_y(momdp))
+            # Create a deterministic belief about hidden state
+            impossible_belief = DiscreteBelief(momdp, states_y_list, [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+            
+            x = SVector{2,Int}((1, 1))
+            a = 6  # Sense first rock
+            o_impossible = 1  # This might be impossible given certain rock configurations
+            
+            # Note: This test might pass if the observation is actually possible
+            # The exact test depends on the specific MOMDP dynamics
+            # We'll test that the function doesn't crash rather than testing specific error
+            try
+                result = update(updater, impossible_belief, a, o_impossible, x, x)
+                @test isa(result, DiscreteBelief)
+            catch e
+                # If it throws an error, it should be the specific error we expect
+                @test occursin("Failed discrete belief update", string(e))
+            end
+        end
+        
+        # Test belief consistency properties
+        @testset "Belief Consistency" begin
+            updater = MOMDPDiscreteUpdater(momdp)
+            b_initial = uniform_belief_y(updater)
+            
+            # Test multiple update steps maintain probability mass
+            x = SVector{2,Int}((1, 1))
+            b_current = b_initial
+            
+            for step in 1:5
+                xp = SVector{2,Int}((min(step + 1, 5), 1))  # Move east but stay in bounds
+                a = 3  # Move east
+                o = 3  # No observation
+                
+                b_current = update(updater, b_current, a, o, x, xp)
+                
+                @test isa(b_current, DiscreteBelief)
+                @test sum(b_current.b) ≈ 1.0
+                @test all(b_current.b .≥ 0.0)  # All probabilities non-negative
+                
+                x = xp  # Update for next iteration
+            end
+        end
+    end
+    
+    @testset "beliefvec_y Tests" begin
+        _, momdp, _ = create_test_rocksample()
+        n_y = length(states_y(momdp))
+        states_y_list = ordered_states_y(momdp)
+        
+        @testset "SparseCat Conversion" begin
+            # Test with sparse categorical distribution
+            sparse_states = [states_y_list[1], states_y_list[3]]
+            sparse_probs = [0.7, 0.3]
+            sparse_belief = SparseCat(sparse_states, sparse_probs)
+            
+            b_vec = MOMDPs.beliefvec_y(momdp, n_y, sparse_belief)
+            
+            @test length(b_vec) == n_y
+            @test b_vec[1] ≈ 0.7  # First state
+            @test b_vec[2] ≈ 0.0  # Not in sparse support
+            @test b_vec[3] ≈ 0.3  # Third state
+            @test sum(b_vec) ≈ 1.0
+            @test all(b_vec .≥ 0.0)
+        end
+        
+        @testset "AbstractVector Conversion" begin
+            # Test with vector input
+            input_vec = [0.2, 0.5, 0.1, 0.2, 0.0, 0.0, 0.0, 0.0]
+            @test length(input_vec) == n_y  # Ensure correct length
+            
+            b_vec = MOMDPs.beliefvec_y(momdp, n_y, input_vec)
+            
+            @test b_vec === input_vec  # Should return same vector
+            @test length(b_vec) == n_y
+            
+            # Test assertion for wrong length
+            wrong_length_vec = [0.5, 0.5]
+            @test_throws AssertionError MOMDPs.beliefvec_y(momdp, n_y, wrong_length_vec)
+        end
+        
+        @testset "DiscreteBelief Conversion" begin
+            # Test with DiscreteBelief
+            prob_vec = [0.1, 0.2, 0.3, 0.4, 0.0, 0.0, 0.0, 0.0]
+            discrete_belief = DiscreteBelief(momdp, states_y_list, prob_vec)
+            
+            b_vec = MOMDPs.beliefvec_y(momdp, n_y, discrete_belief)
+            
+            @test b_vec === discrete_belief.b  # Should return underlying vector
+            @test length(b_vec) == n_y
+            @test b_vec ≈ prob_vec
+        end
+        
+        @testset "Deterministic Conversion" begin
+            # Test with deterministic belief
+            det_state = states_y_list[2]  # Second hidden state
+            det_belief = Deterministic(det_state)
+            
+            b_vec = MOMDPs.beliefvec_y(momdp, n_y, det_belief)
+            
+            @test length(b_vec) == n_y
+            @test sum(b_vec) ≈ 1.0
+            @test count(x -> x > 0, b_vec) == 1  # Only one non-zero element
+            @test b_vec[2] ≈ 1.0  # Second state should have probability 1
+            @test all(b_vec[i] ≈ 0.0 for i in [1, 3, 4, 5, 6, 7, 8])  # Others zero
+        end
+        
+        @testset "Edge Cases" begin
+            # Test with uniform sparse belief
+            uniform_sparse = SparseCat(states_y_list, fill(1.0/n_y, n_y))
+            b_vec_uniform = MOMDPs.beliefvec_y(momdp, n_y, uniform_sparse)
+            
+            @test length(b_vec_uniform) == n_y
+            @test all(b_vec_uniform .≈ 1.0/n_y)
+            @test sum(b_vec_uniform) ≈ 1.0
+            
+            # Test with single state sparse belief
+            single_sparse = SparseCat([states_y_list[1]], [1.0])
+            b_vec_single = MOMDPs.beliefvec_y(momdp, n_y, single_sparse)
+            
+            @test b_vec_single[1] ≈ 1.0
+            @test all(b_vec_single[2:end] .≈ 0.0)
+        end
+    end
+    
+    @testset "actionvalues Tests" begin
+        _, momdp, _ = create_test_rocksample()
+        
+        # Create a simple alpha vector policy for testing
+        n_x = length(states_x(momdp))
+        n_y = length(states_y(momdp))
+        n_actions = length(actions(momdp))
+        
+        # Create simple alphas with different values for different actions
+        alphas = Vector{Vector{Vector{Float64}}}(undef, n_x)
+        action_map = Vector{Vector{Int}}(undef, n_x)
+        
+        for x_idx in 1:n_x
+            # Create multiple alpha vectors for different actions
+            n_alphas = min(3, n_actions)  # Limit for testing
+            alphas[x_idx] = Vector{Vector{Float64}}(undef, n_alphas)
+            action_map[x_idx] = Vector{Int}(undef, n_alphas)
+            
+            for alpha_idx in 1:n_alphas
+                alphas[x_idx][alpha_idx] = zeros(n_y)
+                action_map[x_idx][alpha_idx] = alpha_idx
+                
+                # Create different value patterns for different actions
+                for y_idx in 1:n_y
+                    alphas[x_idx][alpha_idx][y_idx] = alpha_idx * (n_y - y_idx + 1)
+                end
+            end
+        end
+        
+        policy = MOMDPAlphaVectorPolicy(momdp, n_x, n_y, alphas, action_map)
+        
+        @testset "Basic actionvalues Computation" begin
+            # Test with uniform belief over hidden states
+            b_uniform = uniform_belief_y(momdp)
+            x = first(states_x(momdp))
+            
+            qa = MOMDPs.actionvalues(policy, b_uniform, x)
+            
+            @test isa(qa, Vector{Float64})
+            @test length(qa) == n_actions
+            @test all(isfinite.(qa))  # All values should be finite
+            
+            # Action values should be real numbers (can be negative due to step penalties)
+            @test all(isa(q, Real) for q in qa)
+        end
+        
+        @testset "Different Beliefs" begin
+            x = first(states_x(momdp))
+            
+            # Test with deterministic belief
+            det_state = first(ordered_states_y(momdp))
+            b_det = SparseCat([det_state], [1.0])
+            qa_det = MOMDPs.actionvalues(policy, b_det, x)
+            
+            @test length(qa_det) == n_actions
+            @test all(isfinite.(qa_det))
+            
+            # Test with structured belief
+            states_y_list = ordered_states_y(momdp)
+            structured_probs = [0.5, 0.3, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0]
+            b_structured = DiscreteBelief(momdp, states_y_list, structured_probs)
+            qa_structured = MOMDPs.actionvalues(policy, b_structured, x)
+            
+            @test length(qa_structured) == n_actions
+            @test all(isfinite.(qa_structured))
+        end
+        
+        @testset "Different Visible States" begin
+            b = uniform_belief_y(momdp)
+            states_x_list = collect(states_x(momdp))
+            
+            # Test with different visible states
+            x1 = states_x_list[1]
+            x2 = states_x_list[min(2, length(states_x_list))]
+            
+            qa1 = MOMDPs.actionvalues(policy, b, x1)
+            qa2 = MOMDPs.actionvalues(policy, b, x2)
+            
+            @test length(qa1) == n_actions
+            @test length(qa2) == n_actions
+            @test all(isfinite.(qa1))
+            @test all(isfinite.(qa2))
+        end
+    end
+    
     @testset "File I/O Tests" begin
         MOMDPs.is_y_prime_dependent_on_x_prime(::RockSampleMOMDP) = false
         MOMDPs.is_x_prime_dependent_on_y(::RockSampleMOMDP) = false
