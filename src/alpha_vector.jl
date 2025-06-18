@@ -96,15 +96,6 @@ This function computes the value by:
 # Notes
 This is not the most efficient way to get a value if we are operating in a true MOMDP framework. However, this keeps the structure of the code similar to the POMDPs.jl framework.
 """
-function POMDPTools.Policies.value(p::MOMDPAlphaVectorPolicy, b, x)
-    byx = zeros(p.n_states_y)
-    for (j, y) in enumerate(states_y(p.momdp))
-        byx[j] = pdf(b, (x, y))
-    end
-    
-    Vyx = maximum(dot(byx, alpha) for alpha in alphavectors(p, x))
-    return Vyx
-end
 function POMDPTools.Policies.value(p::MOMDPAlphaVectorPolicy, b)
     sup = support(b)
     bx = zeros(p.n_states_x)
@@ -125,6 +116,40 @@ function POMDPTools.Policies.value(p::MOMDPAlphaVectorPolicy, b)
         V += Vyx
     end
     return V
+end
+
+"""
+    value(p::MOMDPAlphaVectorPolicy, b, x)
+
+Calculate the value for a specific visible state `x` given a belief `b` over the joint state space.
+
+# Arguments
+- `p::MOMDPAlphaVectorPolicy`: The alpha vector policy
+- `b`: The belief distribution over the joint state space (x,y)
+- `x`: The specific visible state to evaluate
+
+# Returns
+- The value for the given visible state and belief
+
+# Description
+This function computes the value by:
+1. Extracting the marginal belief over hidden states `y` for the given visible state `x`
+   by evaluating `pdf(b, (x,y))` for all `y`
+2. Finding the maximum dot product between this marginal belief and all alpha vectors
+   associated with visible state `x`
+
+This is more efficient than the general `value(p, b)` function when the visible state
+is known, as it only needs to consider alpha vectors for the specific `x` rather than
+marginalizing over all visible states.
+"""
+function POMDPTools.Policies.value(p::MOMDPAlphaVectorPolicy, b, x)
+    byx = zeros(p.n_states_y)
+    for (j, y) in enumerate(states_y(p.momdp))
+        byx[j] = pdf(b, (x, y))
+    end
+    
+    Vyx = maximum(dot(byx, alpha) for alpha in alphavectors(p, x))
+    return Vyx
 end
 
 """
@@ -168,7 +193,7 @@ over the joint state space (x, y).
   While this heuristic might be sufficient for some problems, we recommend implementing
   a custom action function that performs a one-step lookahead using the `value` function.
 """
-function POMDPs.action(p::MOMDPAlphaVectorPolicy, b)
+function POMDPTools.Policies.action(p::MOMDPAlphaVectorPolicy, b)
     # 1) Identify which x has the maximum mass in b
     sup_b = support(b)
     bx = zeros(p.n_states_x)
@@ -202,4 +227,146 @@ function POMDPs.action(p::MOMDPAlphaVectorPolicy, b)
 
     # 4) Return the action associated with that alpha vector
     return p.action_map[best_x_idx][best_dot_idx]
+end
+
+"""
+    action(p::MOMDPAlphaVectorPolicy, b, x)
+
+Return the action prescribed by the MOMDP alpha-vector policy `p` for the belief `b`
+over the hidden states, given the known visible state `x`.
+
+# Arguments
+- `p::MOMDPAlphaVectorPolicy`: The alpha vector policy
+- `b`: The belief distribution over hidden states `y`
+- `x`: The known visible state
+
+# Returns
+- The action for the given visible state and belief over hidden states
+
+# Description
+This function assumes the visible state `x` is fully observed and known. It:
+1. Converts the belief `b` to a vector representation over hidden states
+2. Among all alpha vectors associated with visible state `x`, finds the one with 
+   the maximum dot product with the belief vector
+3. Returns the action associated with that optimal alpha vector
+
+This is more efficient than the version without explicit `x` when the visible state
+is known at runtime, as it avoids the need to infer `x` from the belief distribution.
+"""
+function POMDPTools.Policies.action(p::MOMDPAlphaVectorPolicy, b, x)
+    x_idx = stateindex_x(p.momdp, x)
+    by_vec = beliefvec_y(p.momdp, p.n_states_y, b)
+
+    best_dot = -Inf
+    best_dot_idx = 1
+    for i in 1:length(p.alphas[x_idx])
+        val = dot(p.alphas[x_idx][i], by_vec)
+        if val > best_dot
+            best_dot = val
+            best_dot_idx = i
+        end
+    end
+    return p.action_map[x_idx][best_dot_idx]
+end
+
+"""
+    actionvalues(p::MOMDPAlphaVectorPolicy, b, x)
+
+Compute the action values (Q-values) for all actions given a belief `b` over hidden 
+states and a known visible state `x`.
+
+# Arguments
+- `p::MOMDPAlphaVectorPolicy`: The alpha vector policy
+- `b`: The belief distribution over hidden states `y`  
+- `x`: The known visible state
+
+# Returns
+- A vector of action values where the ith element is the Q-value for action `i`
+
+# Description
+This function performs a one-step lookahead to compute action values by:
+1. For each action `a` and each hidden state `y` in the belief support:
+   - Computing the immediate reward `R(x,y,a)`
+   - For each possible next visible state `x'` and hidden state `y'`:
+     - For each possible observation `o`:
+       - Updating the belief to get `b'`
+       - Computing the value using the alpha vectors for `x'`
+       - Accumulating the discounted expected future value
+2. Summing over all transitions weighted by their probabilities
+
+The resulting Q-values can be used for action selection or policy evaluation when
+the visible state is known.
+"""
+function POMDPTools.Policies.actionvalues(p::MOMDPAlphaVectorPolicy, b, x)
+    na = length(actions(p.momdp))
+    γ = discount(p.momdp)
+    qa = zeros(na)
+    up = MOMDPDiscreteUpdater(p.momdp)
+    for ai in 1:na
+        for (yi, yprob) in weighted_iterator(b)
+            rew_sum = reward(p.momdp, (x, yi), ai)
+            for (xpi, xpprob) in weighted_iterator(transition_x(p.momdp, (x, yi), ai))
+                xpprob == 0.0 && continue
+                for (ypi, ypprob) in weighted_iterator(transition_y(p.momdp, (x, yi), ai, xpi))
+                    ypprob == 0.0 && continue
+                    for (oi, oprob) in weighted_iterator(observation(p.momdp, ai, (xpi, ypi)))
+                        oprob == 0.0 && continue
+                        bp = update(up, b, ai, oi, x, xpi)
+                        v = maximum(dot(bp.b, alpha) for alpha in MOMDPs.alphavectors(p, xpi))
+                        rew_sum += γ * xpprob * ypprob * oprob * v                        
+                    end
+                end
+            end
+            qa[ai] += rew_sum * yprob
+        end
+    end
+    return qa
+end 
+
+"""
+    beliefvec_y(m::MOMDP, n_states::Int, b)
+
+Convert a belief distribution `b` over hidden states to a vector representation suitable 
+for dot product operations with alpha vectors in a MOMDP.
+
+# Arguments
+- `m::MOMDP`: The MOMDP problem instance
+- `n_states_y::Int`: The number of hidden states in the MOMDP
+- `b`: The belief distribution over hidden states (supports various belief types)
+
+# Returns
+- A vector of length `n_states_y` where element `i` represents the probability of hidden state `i`
+
+# Supported Belief Types
+- `SparseCat`: Converts sparse categorical distribution to dense vector
+- `AbstractVector`: Returns the vector directly (with length assertion)
+- `DiscreteBelief`: Extracts the underlying probability vector
+- `Deterministic`: Creates a one-hot vector for the deterministic state
+
+This function is used internally by alpha vector policies to convert belief distributions
+into the vector format required for computing dot products with alpha vectors.
+"""
+function beliefvec_y end
+
+function beliefvec_y(m::MOMDP, n_states_y, b::SparseCat)
+    b′ = zeros(n_states_y)
+    for (yi, byi) in zip(b.vals, b.probs)
+        y_idx = stateindex_y(m, yi)
+        b′[y_idx] = byi
+    end
+    return b′
+end
+function beliefvec_y(m::MOMDP, n_states_y, b::AbstractVector)
+    @assert length(b) == n_states_y
+    return b
+end
+function beliefvec_y(m::MOMDP, n_states_y, b::DiscreteBelief)
+    @assert length(b) == length(b.b)
+    return b.b
+end
+function beliefvec_y(m::MOMDP, n_states_y, b::Deterministic)
+    y_idx = stateindex_y(m, b.val)
+    b′ = zeros(n_states_y)
+    b′[y_idx] = 1.0
+    return b′
 end
