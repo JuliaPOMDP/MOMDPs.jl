@@ -38,12 +38,17 @@ export
     
     POMDP_of_Discrete_MOMDP,
     
-    MOMDPAlphaVectorPolicy
+    MOMDPAlphaVectorPolicy,
+    beliefvec_y,
+    MOMDPDiscreteUpdater,
+    uniform_belief_y
+    
     
 
 include("momdp.jl")
 include("discrete_momdp_functions.jl")
 include("pomdp_of_momdp.jl")
 include("alpha_vector.jl")
+include("updater.jl")
 
 end # module

@@ -4,6 +4,7 @@ page_order = [
     "MOMDPs.jl" => "index.md",
     "Defining a MOMDP" => "defining_momdp.md",
     "Policies" => "policies.md",
+    "Belief Updaters" => "belief_updaters.md",
     "Discrete Helper Functions" => "discrete_momdp_functions.md",
     "Examples" => "examples.md",
     "API" => "api.md"
