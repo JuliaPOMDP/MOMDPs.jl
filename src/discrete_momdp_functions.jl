@@ -30,11 +30,7 @@ Helper function to return the full transition distribution for discrete MOMDPs. 
     are Tuple{X,Y}. It uses `transition_x` and `transition_y` to construct the
     distribution.
 """
-function POMDPs.transition(p::MOMDP{X,Y,A,O}, s::Tuple{X,Y}, a::A) where {X,Y,A,O}
-    if isterminal(p, s)
-        return SparseCat([s], [1.0])
-    end
-    
+function POMDPs.transition(p::MOMDP{X,Y,A,O}, s::Tuple{X,Y}, a::A) where {X,Y,A,O}    
     x_dist = transition_x(p, s, a)
     
     # Use dictionary to accumulate weights
