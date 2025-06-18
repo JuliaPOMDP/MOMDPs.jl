@@ -303,11 +303,11 @@ function POMDPTools.Policies.actionvalues(p::MOMDPAlphaVectorPolicy, b, x)
     qa = zeros(na)
     up = MOMDPDiscreteUpdater(p.momdp)
     for ai in 1:na
-        for (yi, yprob) in weighted_iterator(b)
+        for (yi, yprob) in weighted_iterator_y(b)
             rew_sum = reward(p.momdp, (x, yi), ai)
             for (xpi, xpprob) in weighted_iterator(transition_x(p.momdp, (x, yi), ai))
                 xpprob == 0.0 && continue
-                for (ypi, ypprob) in weighted_iterator(transition_y(p.momdp, (x, yi), ai, xpi))
+                for (ypi, ypprob) in weighted_iterator_y(transition_y(p.momdp, (x, yi), ai, xpi))
                     ypprob == 0.0 && continue
                     for (oi, oprob) in weighted_iterator(observation(p.momdp, ai, (xpi, ypi)))
                         oprob == 0.0 && continue
@@ -370,3 +370,5 @@ function beliefvec_y(m::MOMDP, n_states_y, b::Deterministic)
     b′[y_idx] = 1.0
     return b′
 end
+
+weighted_iterator_y(d) = (x=>pdf_y(d, x) for x in support(d))
