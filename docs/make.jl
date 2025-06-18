@@ -1,4 +1,4 @@
-using Documenter, POMDPs, MOMDPs
+using Documenter, POMDPs, POMDPTools, MOMDPs
 
 page_order = [
     "MOMDPs.jl" => "index.md",
