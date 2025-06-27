@@ -304,6 +304,7 @@ function POMDPTools.Policies.actionvalues(p::MOMDPAlphaVectorPolicy, b, x)
     up = MOMDPDiscreteUpdater(p.momdp)
     for ai in 1:na
         for (yi, yprob) in weighted_iterator_y(b)
+            yprob == 0.0 && continue
             rew_sum = reward(p.momdp, (x, yi), ai)
             for (xpi, xpprob) in weighted_iterator(transition_x(p.momdp, (x, yi), ai))
                 xpprob == 0.0 && continue

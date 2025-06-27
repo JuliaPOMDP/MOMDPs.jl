@@ -1,6 +1,6 @@
 name = "MOMDPs"
 uuid = "77fc6e33-3f81-4304-8123-5a68e6b3eeb4"
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"

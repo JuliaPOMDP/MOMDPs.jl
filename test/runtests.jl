@@ -7,15 +7,9 @@ using RockSample
 using LinearAlgebra
 using StaticArrays
 using SARSOP
-using POMDPXFiles
 
 using Test
 using Aqua
-
-#! These will be removed when SARSOP and POMDPXFiles are updated
-include("sarsop.jl")
-using ProgressMeter
-include("pomdpxfiles.jl")
 
 include("rocksample_momdp.jl")
 
@@ -126,7 +120,7 @@ end
         @test isa(observations(momdp), AbstractVector)
         
         # Test default conditional independence assumptions
-        mutable struct X <: MOMDP{Float64, Int, Int, Bool} end
+        mutable struct V <: MOMDP{Float64, Int, Int, Bool} end
         x = X()
         @test is_y_prime_dependent_on_x_prime(x) == true
         @test is_x_prime_dependent_on_y(x) == true
@@ -815,49 +809,6 @@ end
             @test all(isfinite.(qa1))
             @test all(isfinite.(qa2))
         end
-    end
-    
-    @testset "File I/O Tests" begin
-        MOMDPs.is_y_prime_dependent_on_x_prime(::RockSampleMOMDP) = false
-        MOMDPs.is_x_prime_dependent_on_y(::RockSampleMOMDP) = false
-        MOMDPs.is_initial_distribution_independent(::RockSampleMOMDP) = true
-        
-        _, momdp, _ = create_test_rocksample()
-        
-        # Create a POMDPXFile
-        pomdpx = POMDPXFile("test_momdp.pomdpx"; description="Test MOMDP")
-        
-        # Write MOMDP to POMDPX file
-        write(momdp, pomdpx)
-        
-        # Number of lines in the POMDPX file
-        n_lines_momdp = countlines("test_momdp.pomdpx")
-        
-        # Test file exists
-        @test isfile("test_momdp.pomdpx")
-        
-        isfile("test_momdp.pomdpx") && rm("test_momdp.pomdpx")
-        
-        # Chnage the dependencies in the MOMDP and check that the new POMDPX file is larger
-        MOMDPs.is_y_prime_dependent_on_x_prime(::RockSampleMOMDP) = true
-        
-        pomdpx = POMDPXFile("test_momdp.pomdpx")
-        write(momdp, pomdpx)
-        n_lines_tft = countlines("test_momdp.pomdpx")
-        @test n_lines_tft > n_lines_momdp
-        
-        MOMDPs.is_x_prime_dependent_on_y(::RockSampleMOMDP) = true
-        write(momdp, pomdpx)
-        n_lines_ttt = countlines("test_momdp.pomdpx")
-        @test n_lines_ttt > n_lines_tft
-        
-        MOMDPs.is_initial_distribution_independent(::RockSampleMOMDP) = false
-        write(momdp, pomdpx)
-        n_lines_ttf = countlines("test_momdp.pomdpx")
-        @test n_lines_ttf > n_lines_ttt
-        
-        # Clean up
-        isfile("test_momdp.pomdpx") && rm("test_momdp.pomdpx")
     end
     
     Aqua.test_all(MOMDPs)

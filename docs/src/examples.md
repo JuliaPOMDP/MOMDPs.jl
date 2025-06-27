@@ -12,6 +12,7 @@ We define the MOMDP type similarly to the existing POMDP and provide a construct
 using POMDPs
 using POMDPTools
 using MOMDPs
+using SARSOP
 using Printf 
 using LinearAlgebra
 using RockSample
@@ -260,20 +261,7 @@ POMDPs.discount(problem::RockSampleMOMDP) = problem.discount_factor
 
 ## Solving using SARSOP
 Now that we have defined our MOMDP, we can solve it with SARSOP. We will create a POMDP RockSample problem and then a MOMDP RockSample problem from the POMDP since our constructor was defined with the POMDP type. Since we have the POMDP, we will also solve the POMDP using SARSOP so we can compare the policies.
-
-!!! note
-    SARSOP.jl and POMDPXFiles.jl have not been updated to work wtih MOMDPs.jl. We must include `test/pomdpxfiles.jl` and `test/sarsop.jl` until the packages are updated. This note will be removed and the examples will be updated when the packages are updated.
     
-```@example running_example
-using SARSOP
-using POMDPXFiles
-using ProgressMeter
-
-include("../../test/sarsop.jl")
-include("../../test/pomdpxfiles.jl")
-
-```
-
 ```@example running_example
 # Create a smaller RockSample problem
 rocksample_pomdp = RockSample.RockSamplePOMDP(
